@@ -2,159 +2,389 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Valentine Locker Surprise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valentine Letter Boxes</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    body{
+      height:100vh;
+      overflow:hidden;
+      font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       background: radial-gradient(circle at top, #ffb6c1, #ff5f8a);
-      font-family: 'Poppins', sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+    }
+
+    .ui {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align:center;
+      z-index: 5;
+      padding: 10px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.15);
+    }
+    .ui h1{
+      font-size: 1.2rem;
+      font-weight: 700;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.25);
+      margin-bottom: 4px;
+    }
+    .ui p{
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* Playground where boxes float */
+    .playground{
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Letter box (envelope-like) */
+    .letter {
+      position: absolute;
+      width: 130px;
+      height: 110px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #ff4d6d, #ff8fab);
+      box-shadow: 0 18px 35px rgba(0,0,0,0.22);
+      cursor: pointer;
+      user-select: none;
+      transform: translate(-50%, -50%);
+      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
       overflow: hidden;
     }
-
-    .scene {
-      position: relative;
-      text-align: center;
+    .letter:hover{
+      transform: translate(-50%, -50%) scale(1.04);
+      box-shadow: 0 22px 45px rgba(0,0,0,0.28);
+      filter: brightness(1.02);
     }
 
-    h1 {
-      color: #fff;
-      margin-bottom: 30px;
-      text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    /* Envelope flap */
+    .letter::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(145deg, rgba(255,255,255,0.10), rgba(255,255,255,0.0));
+      clip-path: polygon(0 0, 100% 0, 50% 55%);
+      opacity: 0.9;
     }
 
-    /* Locker Box */
-    .locker {
-      width: 220px;
-      height: 220px;
-      background: linear-gradient(145deg, #ff4d6d, #ff8fab);
-      border-radius: 20px;
-      position: relative;
-      cursor: pointer;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-      perspective: 800px;
+    .badge{
+      position:absolute;
+      bottom: 10px;
+      left: 10px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      opacity: 0.9;
+      letter-spacing: 0.6px;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.25);
     }
 
-    .door {
+    /* Opened state */
+    .letter.opened{
+      cursor: default;
+      transform: translate(-50%, -50%) scale(1.02);
+      filter: saturate(1.1);
+    }
+
+    /* Message popup bubble */
+    .bubble{
       position: absolute;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(145deg, #ff8fab, #ff4d6d);
-      border-radius: 20px;
-      transform-origin: left;
-      transition: transform 1.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-
-    .locker.open .door {
-      transform: rotateY(-120deg);
-    }
-
-    /* Inside image */
-    .inside {
-      position: absolute;
-      inset: 15px;
-      background: #fff;
-      border-radius: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      left: 50%;
+      top: -10px;
+      transform: translate(-50%, -100%);
+      min-width: 160px;
+      max-width: 250px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.95);
+      color: #ff2f62;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);
       opacity: 0;
-      transform: scale(0.8);
-      transition: opacity 1s ease 0.5s, transform 1s ease 0.5s;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      text-align:center;
+      font-weight: 700;
+      line-height: 1.2;
     }
-
-    .locker.open .inside {
+    .bubble small{
+      display:block;
+      margin-top:6px;
+      font-weight: 600;
+      opacity: 0.8;
+      color: #ff4d6d;
+    }
+    .letter.opened .bubble{
       opacity: 1;
-      transform: scale(1);
+      transform: translate(-50%, -112%);
     }
 
-    .inside img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 12px;
+    /* WIN box glow */
+    .letter.win{
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.45), 0 24px 55px rgba(0,0,0,0.28);
+      animation: winPulse 1.2s ease-in-out infinite;
+    }
+    @keyframes winPulse{
+      0%,100% { transform: translate(-50%, -50%) scale(1.01); }
+      50%     { transform: translate(-50%, -50%) scale(1.06); }
     }
 
     /* Floating hearts */
     .heart {
       position: absolute;
-      width: 14px;
-      height: 14px;
+      width: 14px; height: 14px;
       background: #fff;
       transform: rotate(45deg);
-      animation: float 5s ease-in-out;
       opacity: 0.7;
+      animation: float 5s ease-in-out;
+      z-index: 3;
     }
-    .heart::before, .heart::after {
-      content: '';
-      position: absolute;
-      width: 14px;
-      height: 14px;
-      background: #fff;
-      border-radius: 50%;
+    .heart::before,.heart::after{
+      content:"";
+      position:absolute;
+      width: 14px; height: 14px;
+      background:#fff;
+      border-radius:50%;
     }
-    .heart::before { top: -7px; left: 0; }
-    .heart::after { left: -7px; top: 0; }
+    .heart::before{ top:-7px; left:0; }
+    .heart::after{ left:-7px; top:0; }
 
-    @keyframes float {
-      0% { transform: translateY(0) rotate(45deg); opacity: 0; }
-      50% { opacity: 0.8; }
-      100% { transform: translateY(-120px) rotate(45deg); opacity: 0; }
+    @keyframes float{
+      0%   { transform: translateY(0) rotate(45deg); opacity: 0; }
+      35%  { opacity: 0.85; }
+      100% { transform: translateY(-140px) rotate(45deg); opacity: 0; }
     }
 
-    .hint {
-      margin-top: 15px;
-      color: #fff;
-      font-size: 0.9rem;
-      opacity: 0.85;
+    /* Image reveal modal */
+    .modal{
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.35);
+      z-index: 10;
+      padding: 18px;
+    }
+    .modal.show{ display:flex; }
+    .card{
+      width: min(520px, 92vw);
+      background: rgba(255,255,255,0.95);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: 0 30px 70px rgba(0,0,0,0.28);
+      position: relative;
+      animation: pop .35s ease;
+    }
+    @keyframes pop{
+      from{ transform: translateY(8px) scale(0.98); opacity: 0; }
+      to  { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .card img{
+      width:100%;
+      height: 360px;
+      object-fit: cover;
+      display:block;
+    }
+    .card .caption{
+      padding: 14px 16px 18px;
+      text-align:center;
+      color:#ff2f62;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+    .close{
+      position:absolute;
+      top: 10px;
+      right: 10px;
+      border: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.85);
+      cursor:pointer;
+      font-size: 18px;
+      font-weight: 900;
+      color:#ff2f62;
     }
   </style>
 </head>
 <body>
 
-  <div class="scene">
-    <h1>Tap to Unlock 💝</h1>
+  <div class="ui">
+    <h1>Find the Special Letter 💌</h1>
+    <p>Tap any box — only one unlocks the surprise</p>
+  </div>
 
-    <div class="locker" id="locker">
-      <div class="door">OPEN ME</div>
-      <div class="inside">
-        <!-- CHANGE IMAGE HERE -->
-        <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9" alt="Valentine Surprise" />
-      </div>
+  <div class="playground" id="playground"></div>
+
+  <!-- Image reveal -->
+  <div class="modal" id="modal">
+    <div class="card">
+      <button class="close" id="closeBtn">✕</button>
+      <!-- CHANGE IMAGE HERE -->
+      <img id="surpriseImg" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1200&q=60" alt="Surprise" />
+      <div class="caption" id="caption">Forever yours 💝</div>
     </div>
-
-    <div class="hint">Click the box to reveal the surprise</div>
   </div>
 
   <script>
-    const locker = document.getElementById('locker');
+    // ====== SETTINGS YOU CAN CHANGE ======
+    const BOX_COUNT = 18;
 
-    locker.addEventListener('click', () => {
-      locker.classList.toggle('open');
-      createHearts();
-    });
+    const winningMessage = "You’re my Valentine 💝<small>Happy Valentine’s Day, luv uuu</small>";
 
-    function createHearts() {
-      for (let i = 0; i < 8; i++) {
+    const otherMessages = [
+      "A tiny hug for you 🤗",
+      "You are my favorite person 💗",
+      "Smile! You look cute 😄",
+      "A kiss is loading… 😘",
+      "You make my heart go 💓",
+      "I’m lucky to have you 🍀",
+      "One more click… maybe 😏",
+      "Sweet like chocolate 🍫",
+      "I thought of you today 🌸",
+      "You + Me = ❤️"
+    ];
+
+    // After winning box opened, modal image opens after this delay (ms)
+    const IMAGE_REVEAL_DELAY = 1200;
+
+    // ====== LOGIC ======
+    const playground = document.getElementById('playground');
+    const modal = document.getElementById('modal');
+    const closeBtn = document.getElementById('closeBtn');
+
+    // Pick one winning index
+    const winningIndex = Math.floor(Math.random() * BOX_COUNT);
+    let won = false;
+
+    // Create boxes with random positions + subtle drifting
+    const letters = [];
+
+    function random(min, max) { return Math.random() * (max - min) + min; }
+
+    function createLetter(i){
+      const el = document.createElement('div');
+      el.className = 'letter';
+      el.dataset.index = i;
+
+      // random position (keep inside viewport)
+      const x = random(10, 90);
+      const y = random(18, 88);
+
+      el.style.left = x + 'vw';
+      el.style.top  = y + 'vh';
+
+      // random drift animation using JS loop (so it "moves randomly")
+      const drift = {
+        el,
+        x, y,
+        vx: random(-0.018, 0.018),
+        vy: random(-0.014, 0.014)
+      };
+
+      el.innerHTML = `
+        <div class="bubble"></div>
+        <div class="badge">OPEN</div>
+      `;
+
+      el.addEventListener('click', () => openLetter(i, el));
+
+      playground.appendChild(el);
+      letters.push(drift);
+    }
+
+    function openLetter(i, el){
+      if (el.classList.contains('opened')) return;
+
+      el.classList.add('opened');
+
+      const bubble = el.querySelector('.bubble');
+
+      // If already won, only show normal messages
+      if (won) {
+        bubble.innerHTML = otherMessages[Math.floor(Math.random() * otherMessages.length)];
+        burstHearts(el, 6);
+        return;
+      }
+
+      if (i === winningIndex) {
+        won = true;
+        el.classList.add('win');
+        bubble.innerHTML = winningMessage;
+        burstHearts(el, 14);
+
+        // reveal the image after a short delay
+        setTimeout(() => {
+          modal.classList.add('show');
+        }, IMAGE_REVEAL_DELAY);
+
+      } else {
+        bubble.innerHTML = otherMessages[Math.floor(Math.random() * otherMessages.length)];
+        burstHearts(el, 6);
+      }
+    }
+
+    function burstHearts(anchorEl, count){
+      const rect = anchorEl.getBoundingClientRect();
+      for (let i = 0; i < count; i++){
         const heart = document.createElement('div');
         heart.className = 'heart';
-        heart.style.left = Math.random() * 220 + 'px';
-        heart.style.bottom = '0px';
-        locker.appendChild(heart);
+
+        // start around the clicked box
+        const startX = rect.left + rect.width/2 + random(-40, 40);
+        const startY = rect.top + rect.height/2 + random(10, 35);
+
+        heart.style.left = startX + 'px';
+        heart.style.top  = startY + 'px';
+
+        document.body.appendChild(heart);
         setTimeout(() => heart.remove(), 5000);
       }
     }
-  </script>
 
+    closeBtn.addEventListener('click', () => modal.classList.remove('show'));
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.classList.remove('show');
+    });
+
+    // Create all letters
+    for (let i = 0; i < BOX_COUNT; i++) createLetter(i);
+
+    // Drift animation loop (random floating feel)
+    function animate(){
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      for (const l of letters){
+        // do not move opened boxes too much (optional)
+        const opened = l.el.classList.contains('opened');
+        const speed = opened ? 0.35 : 1;
+
+        l.x += l.vx * speed;
+        l.y += l.vy * speed;
+
+        // bounce inside safe bounds
+        if (l.x < 8 || l.x > 92) l.vx *= -1;
+        if (l.y < 14 || l.y > 90) l.vy *= -1;
+
+        l.el.style.left = l.x + 'vw';
+        l.el.style.top  = l.y + 'vh';
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
 </body>
 </html>
