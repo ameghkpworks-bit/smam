@@ -77,7 +77,10 @@
       opacity: 1;
       transform: scale(1);
     }
-
+ .key-icon {
+      width: clamp(36px, 10vw, 54px);
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.25));
+    }
     .inside img {
       width: 100%;
       height: 100%;
@@ -125,11 +128,25 @@
   <div class="scene">
     <h1>Tap to Unlock 💝</h1>
 
-    <div class="locker" id="locker">
-      <div class="door">OPEN ME</div>
+   <div class="locker" id="locker" role="button" tabindex="0">
+      <div class="door">
+        <div class="door-content">
+          <!-- KEY IMAGE -->
+          <img
+            src="https://img.icons8.com/?size=100&id=OkhhYr757p21&format=png&color=000000"
+            alt="Key"
+            class="key-icon"
+          />
+          <span>OPEN ME</span>
+        </div>
+      </div>
+
       <div class="inside">
         <!-- CHANGE IMAGE HERE -->
-        <img src="assets/smam.jpeg" alt="Valentine Surprise" />
+        <img
+          src="assets/smam.jpeg"
+          alt="Valentine Surprise"
+        />
       </div>
     </div>
 
@@ -157,4 +174,5 @@
   </script>
 
 </body>
+
 </html>
