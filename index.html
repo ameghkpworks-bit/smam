@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Valentine Locker Surprise</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #ffb6c1, #ff5f8a);
+      font-family: 'Poppins', sans-serif;
+      overflow: hidden;
+    }
+
+    .scene {
+      position: relative;
+      text-align: center;
+    }
+
+    h1 {
+      color: #fff;
+      margin-bottom: 30px;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    /* Locker Box */
+    .locker {
+      width: 220px;
+      height: 220px;
+      background: linear-gradient(145deg, #ff4d6d, #ff8fab);
+      border-radius: 20px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      perspective: 800px;
+    }
+
+    .door {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(145deg, #ff8fab, #ff4d6d);
+      border-radius: 20px;
+      transform-origin: left;
+      transition: transform 1.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .locker.open .door {
+      transform: rotateY(-120deg);
+    }
+
+    /* Inside image */
+    .inside {
+      position: absolute;
+      inset: 15px;
+      background: #fff;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 1s ease 0.5s, transform 1s ease 0.5s;
+    }
+
+    .locker.open .inside {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .inside img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    /* Floating hearts */
+    .heart {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      transform: rotate(45deg);
+      animation: float 5s ease-in-out;
+      opacity: 0.7;
+    }
+    .heart::before, .heart::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+    }
+    .heart::before { top: -7px; left: 0; }
+    .heart::after { left: -7px; top: 0; }
+
+    @keyframes float {
+      0% { transform: translateY(0) rotate(45deg); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(-120px) rotate(45deg); opacity: 0; }
+    }
+
+    .hint {
+      margin-top: 15px;
+      color: #fff;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene">
+    <h1>Tap to Unlock 💝</h1>
+
+    <div class="locker" id="locker">
+      <div class="door">OPEN ME</div>
+      <div class="inside">
+        <!-- CHANGE IMAGE HERE -->
+        <img src="assets/smam.jpeg" alt="Valentine Surprise" />
+      </div>
+    </div>
+
+    <div class="hint">Click the box to reveal the surprise</div>
+  </div>
+
+  <script>
+    const locker = document.getElementById('locker');
+
+    locker.addEventListener('click', () => {
+      locker.classList.toggle('open');
+      createHearts();
+    });
+
+    function createHearts() {
+      for (let i = 0; i < 8; i++) {
+        const heart = document.createElement('div');
+        heart.className = 'heart';
+        heart.style.left = Math.random() * 220 + 'px';
+        heart.style.bottom = '0px';
+        locker.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+      }
+    }
+  </script>
+
+</body>
+</html>
